@@ -1,0 +1,425 @@
+/* ==========================================================================
+   Seek Collective — coming soon
+   Tokens taken straight from the Figma file (ux1PO4TFjKtTo15nsaVMXD):
+     page        #f8f4f1
+     body copy   #0a0742
+     navy rules  #0f0c4f
+     typeface    Inria Serif
+   Mobile-first; the two-column desktop artboard takes over at 900px.
+   ========================================================================== */
+
+:root {
+  --bg:        #f8f4f1;
+  --ink:       #0a0742;
+  --navy:      #0f0c4f;
+  --rule:      #0f0c4f;
+
+  --font: "Inria Serif", "Iowan Old Style", "Palatino Linotype", Palatino,
+          Georgia, "Times New Roman", serif;
+
+  /* Body copy. Figma sets 10px on an 809px-wide artboard (~0.56 scale),
+     so the desktop equivalent lands near 17px. */
+  --fs-body: clamp(11.5px, 3.3vw, 14px);
+
+  /* Hero aspect ratio, from the 254 x 383 Figma placement. */
+  --hero-ratio: 254 / 383;
+
+  --sq: 17px;                       /* social square */
+  --sq-gap: calc(var(--sq) * 1.5);  /* Figma pitch: 45px on an 18px square */
+
+  --gutter: 22px;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.32;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p { margin: 0; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:where(a, button, input):focus-visible {
+  outline: 1.5px solid var(--navy);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10;
+  padding: 8px 14px;
+  background: var(--navy);
+  color: var(--bg);
+}
+.skip-link:focus { left: 8px; top: 8px; }
+
+/* ── Shell ───────────────────────────────────────────────────────────────
+   Mobile: one centred stack — logo, hero, copy, footer.                    */
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 3.4vw, 22px);
+  padding: clamp(16px, 4.5vw, 26px) var(--gutter) clamp(20px, 5vw, 28px);
+}
+
+.hero {
+  order: 2;
+  margin: 0;
+  width: min(100%, 360px);
+  align-self: center;
+}
+
+.hero__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--hero-ratio);
+  max-height: 54svh;
+  object-fit: cover;
+  object-position: center;
+  background: #d9d4d0;   /* holds the layout while the photo loads */
+}
+
+.content {
+  order: 1;
+  display: contents;     /* mobile: children join the page stack directly */
+}
+
+.content__head { order: 1; }
+.content__main { order: 3; }
+.content__foot { order: 4; }
+
+/* ── Logo ────────────────────────────────────────────────────────────────
+   S E / E K laid out on a 2x2 grid with the small hand-set offsets from
+   the artboard, then COLLECTIVE tracked out beneath.                       */
+
+.logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.34em;
+  font-size: clamp(19px, 5.4vw, 24px);
+  line-height: 1;
+}
+
+.content__head {
+  display: flex;
+  justify-content: center;
+}
+
+.logo__mark {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  column-gap: 0.62em;
+  row-gap: 0.9em;
+  line-height: 1;
+}
+
+.logo__letter { display: block; }
+
+.logo__letter--s  { transform: translateY(0); }
+.logo__letter--e1 { transform: translateY(0.2em); }
+.logo__letter--e2 { transform: translateY(0.08em); }
+.logo__letter--k  { transform: translateY(-0.02em); }
+
+.logo__word {
+  font-size: 0.29em;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  /* the tracking on the last glyph would otherwise push the word off-centre */
+  text-indent: 0.25em;
+}
+
+/* ── Copy + signup ───────────────────────────────────────────────────── */
+
+.content__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 4vw, 22px);
+}
+
+.tagline {
+  max-width: 26em;
+  margin: 0;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.32;
+  text-wrap: pretty;
+}
+
+.signup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6em 0.7em;
+}
+
+.signup__label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  line-height: 1.32;
+}
+
+.signup__form {
+  position: relative;
+  flex: 1 1 130px;
+  max-width: 250px;
+}
+
+.field {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.field__input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  padding: 0.36em 0.6em;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.field__input::placeholder {
+  color: var(--ink);
+  opacity: 0.42;
+}
+
+.field__input:focus { outline: none; }
+.field:focus-within  { outline: 1.5px solid var(--navy); outline-offset: 2px; }
+
+.field__submit {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 2.1em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.18s ease;
+}
+
+.field__submit:hover,
+.field__submit:focus-visible,
+.field:focus-within .field__submit { opacity: 1; }
+
+.field__submit svg { width: 1.05em; height: 1.05em; }
+
+.signup__status {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.4em;
+  font-size: 0.86em;
+  line-height: 1.32;
+}
+
+.signup__status--error { color: #8c2f2f; }
+
+/* form is in flight / done */
+.signup.is-busy  .field__submit { opacity: 0.3; pointer-events: none; }
+.signup.is-done  .field         { opacity: 0.45; }
+.signup.is-done  .field__input,
+.signup.is-done  .field__submit { pointer-events: none; }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+
+.content__foot {
+  margin-top: auto;
+  padding-top: clamp(12px, 3vw, 18px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer-nav {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75em;
+  white-space: nowrap;
+}
+
+.footer-nav a { border-bottom: 1px solid transparent; }
+.footer-nav a:hover,
+.footer-nav a:focus-visible { border-bottom-color: currentColor; }
+
+.footer-nav__sep { opacity: 0.75; }
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: var(--sq-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social__link {
+  display: grid;
+  place-items: center;
+  width: var(--sq);
+  height: var(--sq);
+  background: var(--navy);
+  color: var(--bg);
+  transition: opacity 0.18s ease;
+}
+
+.social__link:hover,
+.social__link:focus-visible { opacity: 0.72; }
+
+.social__icon {
+  width: 72%;
+  height: 72%;
+}
+
+/* ── Desktop artboard (809 x 418) ────────────────────────────────────────
+   Photo down the left at ~31.4% of the frame, everything else in a column
+   on the right: logo pinned top, copy centred, footer pinned bottom.       */
+
+@media (min-width: 900px) {
+  :root {
+    --fs-body: clamp(13px, 1.18vw, 17px);
+    --sq: clamp(20px, 2.1vw, 30px);
+    --gutter: 4%;
+  }
+
+  .page {
+    height: 100svh;
+    min-height: 520px;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    padding: 4% var(--gutter);
+  }
+
+  .hero {
+    order: 0;
+    flex: 0 0 34%;
+    width: auto;
+    align-self: stretch;
+    min-height: 0;
+  }
+
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    max-height: none;
+  }
+
+  .content {
+    display: flex;             /* stops being `contents` — becomes the column */
+    order: 1;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  /* The artboard right-aligns copy and footer on a shared edge (x=703 of
+     809). Reproduced as one centred column that both blocks fill. */
+  .content__head,
+  .content__foot {
+    width: min(100%, 36em);
+  }
+
+  .content__main {
+    width: min(100%, 36em);
+  }
+
+  /* Copy is narrower than the footer but shares its right edge (x=703 of
+     809 on the artboard). */
+  .content__main > * {
+    width: min(100%, 26em);
+    margin-left: auto;
+  }
+
+  .content__head {
+    justify-content: center;
+    margin-bottom: auto;
+  }
+
+  .logo { font-size: clamp(24px, 2.35vw, 34px); }
+
+  .content__main {
+    margin-block: auto;
+    gap: clamp(18px, 2vw, 26px);
+  }
+
+  .signup {
+    flex-wrap: nowrap;
+    gap: 0.75em;
+  }
+
+  .signup__form {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
+  .content__foot {
+    margin-top: auto;
+    padding-top: clamp(16px, 2.4vw, 28px);
+  }
+}
+
+/* Short landscape windows: let the page scroll rather than crush the photo. */
+@media (min-width: 900px) and (max-height: 560px) {
+  .page { height: auto; min-height: 100svh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
