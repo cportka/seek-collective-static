@@ -9,7 +9,7 @@ index.html                     markup for the whole page
 assets/css/styles.css          all styling; mobile-first, desktop at >= 900px
 assets/js/newsletter.js        progressive enhancement for the signup form
 assets/img/hero.jpg            the hero photograph
-assets/img/favicon.svg         SEEK mark as a favicon
+assets/img/favicon-*.png       favicons (32 / 180 / 512), SEEK mark only
 .github/workflows/deploy.yml   build + deploy to GitHub Pages
 ```
 
@@ -98,3 +98,11 @@ python3 -m http.server 8000
   (`--frame: 10vw`, so the frame is square in real pixels rather than
   10%-of-width beside 10%-of-height). Mobile keeps a 14px gutter with a
   minimum 50px below the footer.
+- **Favicons** are generated from the logo's SEEK mark only. COLLECTIVE is an
+  illegible smudge below about 64px and shrinks the letters, so it is cropped
+  out; the crop box is `[26, 0, 128, 191]` of the 180x243 source. Sizes 32,
+  180 (apple-touch) and 512, all on the `#f8f4f1` page ground.
+- **Photo/copy separation:** the desktop row carries `gap: max(40px, 2.6vw)`,
+  which guarantees at least 40px between the photograph and the copy column.
+  The footer nav is the leftmost element in that column, so this is what keeps
+  "Consulting // Contact" clear of the photo at narrow desktop widths.
