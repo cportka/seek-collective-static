@@ -39,16 +39,16 @@
   <div class="content">
 
     <header class="content__head">
-      <!-- Wordmark, deliberately not a link. -->
+      <!-- Wordmark, deliberately not a link. AVIF with a PNG fallback for
+           Safari below 16.4, which cannot decode AVIF. -->
       <div class="logo">
-        <span class="visually-hidden">Seek Collective</span>
-        <span class="logo__mark" aria-hidden="true">
-          <span class="logo__letter logo__letter--s">S</span>
-          <span class="logo__letter logo__letter--e1">E</span>
-          <span class="logo__letter logo__letter--e2">E</span>
-          <span class="logo__letter logo__letter--k">K</span>
-        </span>
-        <span class="logo__word" aria-hidden="true">Collective</span>
+        <picture>
+          <source srcset="assets/img/seek-collective-logo.avif" type="image/avif">
+          <img class="logo__img"
+               src="assets/img/seek-collective-logo.png"
+               width="180" height="243"
+               alt="Seek Collective">
+        </picture>
       </div>
     </header>
 
