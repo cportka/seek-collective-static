@@ -89,13 +89,11 @@ python3 -m http.server 8000
   To swap it, replace the file and update `--hero-ratio` in
   `assets/css/styles.css` plus the intrinsic `width`/`height` on the `<img>`
   in `index.html` if the new file has different dimensions.
-- **The SEEK wordmark is live text**, not a raster. The letters cascade down
-  four staggered levels alternating between two columns; the placement is in
-  the `.logo__letter--*` rules in `assets/css/styles.css`. It is deliberately
-  **not a link**. To swap in an image instead, drop the file into
-  `assets/img/` and replace the `.logo__mark` span in `index.html` with an
-  `<img>` — the surrounding `.logo` flex column already centres it above
-  COLLECTIVE.
+- **The wordmark** is `assets/img/seek-collective-logo.avif` (180x243, real
+  alpha), served through a `<picture>` with `seek-collective-logo.png` as the
+  fallback for Safari below 16.4, which cannot decode AVIF. The PNG is
+  generated from the AVIF, so colour and alpha match exactly. The logo is
+  deliberately **not a link**; size it with the `.logo` width rules.
 - **Frame:** desktop is a uniform 10% of the viewport width on all four sides
   (`--frame: 10vw`, so the frame is square in real pixels rather than
   10%-of-width beside 10%-of-height). Mobile keeps a 14px gutter with a

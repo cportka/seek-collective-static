@@ -130,48 +130,20 @@ img {
    the artboard, then COLLECTIVE tracked out beneath.                       */
 
 .logo {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.42em;
-  font-size: clamp(16px, 4.4vw, 21px);
-  line-height: 1;
+  display: block;
+  width: clamp(52px, 15vw, 66px);
+}
+
+.logo picture { display: block; }
+
+.logo__img {
+  width: 100%;
+  height: auto;
 }
 
 .content__head {
   display: flex;
   justify-content: center;
-}
-
-.logo__mark {
-  /* S / E / E / K cascade down four staggered levels, alternating between
-     two columns, so the letters read as a descending diagonal. Absolute
-     placement because the vertical steps are shorter than a line box. */
-  position: relative;
-  display: block;
-  width: 2.16em;
-  height: 3.78em;
-  line-height: 1;
-}
-
-.logo__letter {
-  position: absolute;
-  display: block;
-  line-height: 1;
-}
-
-.logo__letter--s  { left: 0;      top: 0; }
-.logo__letter--e1 { left: 1.50em; top: 0.78em; }
-.logo__letter--e2 { left: 0.02em; top: 1.88em; }
-.logo__letter--k  { left: 1.46em; top: 2.80em; }
-
-.logo__word {
-  font-size: 0.38em;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  /* the tracking on the last glyph would otherwise push the word off-centre */
-  text-indent: 0.3em;
 }
 
 /* ── Copy + signup ───────────────────────────────────────────────────── */
@@ -405,7 +377,7 @@ img {
     margin-bottom: auto;
   }
 
-  .logo { font-size: clamp(20px, 1.85vw, 28px); }
+  .logo { width: clamp(74px, 6.7vw, 100px); }
 
   .content__main {
     margin-block: auto;
