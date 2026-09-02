@@ -21,13 +21,14 @@
      so the desktop equivalent lands near 17px. */
   --fs-body: clamp(11.5px, 3.3vw, 14px);
 
-  /* Hero aspect ratio, from the 254 x 383 Figma placement. */
-  --hero-ratio: 254 / 383;
+  /* Intrinsic ratio of the photograph. The image is never cropped: it is
+     always laid out or fitted to this ratio. */
+  --hero-ratio: 1074 / 1620;
 
   --sq: 17px;                       /* social square */
   --sq-gap: calc(var(--sq) * 1.5);  /* Figma pitch: 45px on an 18px square */
 
-  --gutter: 22px;
+  --gutter: 14px;
 }
 
 *,
@@ -96,25 +97,23 @@ img {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  gap: clamp(14px, 3.4vw, 22px);
-  padding: clamp(16px, 4.5vw, 26px) var(--gutter) clamp(20px, 5vw, 28px);
+  gap: clamp(10px, 2.6vw, 16px);
+  padding: clamp(10px, 3vw, 16px) var(--gutter) clamp(12px, 3.4vw, 18px);
 }
 
 .hero {
   order: 2;
   margin: 0;
-  width: min(100%, 360px);
+  width: 100%;
   align-self: center;
 }
 
 .hero__img {
+  /* height:auto renders the photo at its own ratio, so nothing is ever
+     cropped; aspect-ratio only reserves the space before it loads. */
   width: 100%;
   height: auto;
   aspect-ratio: var(--hero-ratio);
-  max-height: 54svh;
-  object-fit: cover;
-  object-position: center;
-  background: #d9d4d0;   /* holds the layout while the photo loads */
 }
 
 .content {
@@ -178,7 +177,8 @@ img {
 
 .tagline {
   max-width: 26em;
-  margin: 0;
+  margin: 0 auto;
+  text-align: center;
   font-size: 1em;
   font-weight: 400;
   line-height: 1.32;
@@ -187,21 +187,22 @@ img {
 
 .signup {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.6em 0.7em;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7em;
 }
 
 .signup__label {
   flex: 0 0 auto;
   white-space: nowrap;
+  text-align: center;
   line-height: 1.32;
 }
 
 .signup__form {
   position: relative;
-  flex: 1 1 130px;
-  max-width: 250px;
+  width: min(100%, 15em);
 }
 
 .field {
@@ -276,8 +277,8 @@ img {
   padding-top: clamp(12px, 3vw, 18px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  gap: clamp(16px, 5vw, 28px);
 }
 
 .footer-nav {
@@ -328,7 +329,8 @@ img {
   :root {
     --fs-body: clamp(13px, 1.18vw, 17px);
     --sq: clamp(20px, 2.1vw, 30px);
-    --gutter: 4%;
+    --gutter: 2.4%;
+    --frame-y: clamp(18px, 2.6vw, 40px);
   }
 
   .page {
@@ -337,22 +339,23 @@ img {
     flex-direction: row;
     align-items: stretch;
     gap: 0;
-    padding: 4% var(--gutter);
+    padding: var(--frame-y) var(--gutter);
   }
 
   .hero {
     order: 0;
-    flex: 0 0 34%;
-    width: auto;
-    align-self: stretch;
+    flex: 0 0 auto;
+    align-self: center;
+    height: auto;
+    width: min(46%, calc((100svh - 2 * var(--frame-y)) * 1074 / 1620));
     min-height: 0;
   }
 
   .hero__img {
     width: 100%;
-    height: 100%;
-    aspect-ratio: auto;
-    max-height: none;
+    height: auto;
+    aspect-ratio: var(--hero-ratio);
+    object-fit: contain;   /* belt and braces: never crop */
   }
 
   .content {
@@ -379,8 +382,13 @@ img {
      809 on the artboard). */
   .content__main > * {
     width: min(100%, 26em);
-    margin-left: auto;
+    /* both sides, or the mobile rule's `margin: 0 auto` re-centres the block */
+    margin-inline: auto 0;
+    text-align: left;
   }
+
+  .signup { justify-content: flex-start; }
+  .signup__label { text-align: left; }
 
   .content__head {
     justify-content: center;
@@ -395,18 +403,23 @@ img {
   }
 
   .signup {
+    flex-direction: row;
     flex-wrap: nowrap;
+    align-items: flex-end;
     gap: 0.75em;
   }
 
   .signup__form {
     flex: 1 1 auto;
+    width: auto;
     max-width: none;
   }
 
   .content__foot {
     margin-top: auto;
     padding-top: clamp(16px, 2.4vw, 28px);
+    justify-content: space-between;
+    gap: 16px;
   }
 }
 

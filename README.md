@@ -82,9 +82,14 @@ python3 -m http.server 8000
   and `https://seekcollective.com/pages/contact`. Those are assumed Shopify page
   paths; correct them in `index.html` if the live URLs differ.
 - **Social links** are in the `.social` list at the bottom of `index.html`.
-- **The hero photograph at `assets/img/hero.jpg` is a placeholder.** It is a
-  labelled grey JPEG at the correct 1056 x 1568 so the layout and the deploy
-  hold. Overwrite that one file with the real photograph — nothing else needs
-  to change. It is `object-fit: cover` in both layouts, so any portrait crop
-  works, and the intrinsic `width`/`height` on the `<img>` in `index.html`
-  should be updated to match if the replacement is a different size.
+- **The hero photograph** is `assets/img/hero.jpg` (1074 x 1620). It is never
+  cropped at any viewport: on desktop the column is sized from the height
+  available (`min(46%, availableHeight * ratio)`) so the box equals the
+  photograph exactly, and on mobile it is full width at `height: auto`.
+  To swap it, replace the file and update `--hero-ratio` in
+  `assets/css/styles.css` plus the intrinsic `width`/`height` on the `<img>`
+  in `index.html` if the new file has different dimensions.
+- **The SEEK wordmark is live text**, not the raster in the Figma file. That
+  asset is a 61 x 79 screenshot of type, so setting it in Inria Serif keeps it
+  sharp at any pixel density, scalable, and selectable. The 2x2 grid and its
+  per-letter offsets are in the `.logo` rules.
