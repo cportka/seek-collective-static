@@ -363,12 +363,10 @@ img {
     width: min(100%, 36em);
   }
 
-  /* Copy is narrower than the footer but shares its right edge (x=703 of
-     809 on the artboard). */
+  /* Copy is narrower than the footer and centred on the logo's axis. */
   .content__main > * {
     width: min(100%, 26em);
-    /* both sides, or the mobile rule's `margin: 0 auto` re-centres the block */
-    margin-inline: auto 0;
+    margin-inline: auto;
     text-align: left;
   }
 
