@@ -320,7 +320,10 @@ img {
     min-height: 520px;
     flex-direction: row;
     align-items: stretch;
-    gap: 0;
+    /* Never let the copy column crowd the photograph. The footer nav is the
+       leftmost thing in that column, so this floor is what keeps at least
+       40px between the photo and "Consulting // Contact". */
+    gap: max(40px, 2.6vw);
     padding: var(--frame);
   }
 

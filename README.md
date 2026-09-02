@@ -98,3 +98,7 @@ python3 -m http.server 8000
   (`--frame: 10vw`, so the frame is square in real pixels rather than
   10%-of-width beside 10%-of-height). Mobile keeps a 14px gutter with a
   minimum 50px below the footer.
+- **Photo/copy separation:** the desktop row carries `gap: max(40px, 2.6vw)`,
+  which guarantees at least 40px between the photograph and the copy column.
+  The footer nav is the leftmost element in that column, so this is what keeps
+  "Consulting // Contact" clear of the photo at narrow desktop widths.
