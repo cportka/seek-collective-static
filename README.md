@@ -78,9 +78,8 @@ python3 -m http.server 8000
 
 ## Notes
 
-- **`Consulting` and `Contact`** point at `https://seekcollective.com/pages/consulting`
-  and `https://seekcollective.com/pages/contact`. Those are assumed Shopify page
-  paths; correct them in `index.html` if the live URLs differ.
+- **Footer links** are `mailto:` addresses: Contact -> info@seekcollective.com,
+  Consulting -> consulting@seekcollective.com, in that order.
 - **Social links** are in the `.social` list at the bottom of `index.html`.
 - **The hero photograph** is `assets/img/hero.jpg` (1074 x 1620). It is never
   cropped at any viewport: on desktop the column is sized from the height
