@@ -1,70 +1,61 @@
 /*
  * Newsletter signup.
  *
- * The form posts the exact same payload to the exact same Shopify endpoint as
- * the footer signup on seekcollective.com (form_type=customer, utf8,
- * contact[tags]=newsletter, contact[email]). With JavaScript off it simply
- * submits and the browser follows Shopify's redirect, which is what the live
- * site does today.
+ * The form posts the exact payload the live seekcollective.com footer signup
+ * posts, verified against that page's server-rendered HTML:
  *
- * This file is progressive enhancement only: it retargets that same submit at
- * a hidden iframe so a visitor on the coming-soon page stays on it. The
- * response is cross-origin, so we cannot read whether Shopify accepted the
- * address — we confirm once the request has been dispatched, exactly as an
- * ordinary cross-origin form post would.
+ *   POST /contact#footer-newsletter
+ *     form_type      = customer
+ *     utf8           = ✓
+ *     contact[tags]  = newsletter
+ *     contact[email] = <address>
+ *
+ * With JavaScript off the form submits natively and the browser follows
+ * Shopify's redirect, exactly as the live site does.
+ *
+ * This file is progressive enhancement: it sends the same body with fetch so
+ * the visitor stays on the coming-soon page. The storefront serves
+ * `X-Frame-Options: DENY` and `frame-ancestors 'none'`, so a hidden-iframe
+ * target can never render the response — fetch in no-cors mode is the honest
+ * equivalent and settles as soon as the response lands instead of waiting out
+ * a timeout. The response is opaque, so we can confirm that the request was
+ * delivered but not what Shopify decided about the address.
  */
 (function () {
   'use strict';
 
   var form = document.getElementById('footer-newsletter');
-  if (!form) return;
+  if (!form || typeof window.fetch !== 'function') return;
 
   var wrap   = form.closest('.signup');
   var input  = form.querySelector('input[type="email"]');
   var status = form.querySelector('.signup__status');
   if (!wrap || !input || !status) return;
 
-  var TIMEOUT_MS = 6000;
-  var settled = false;
-  var timer = null;
+  var TIMEOUT_MS = 8000;
 
   // Take over validation messaging now that we can render it ourselves.
   form.noValidate = true;
-
-  var frame = document.createElement('iframe');
-  frame.name = 'sc-newsletter-target';
-  frame.title = 'Newsletter signup';
-  frame.tabIndex = -1;
-  frame.setAttribute('aria-hidden', 'true');
-  frame.style.cssText =
-    'position:absolute;left:-9999px;top:0;width:0;height:0;border:0;';
-  document.body.appendChild(frame);
-  form.target = frame.name;
 
   function say(message, isError) {
     status.textContent = message;
     status.classList.toggle('signup__status--error', Boolean(isError));
   }
 
-  function settle() {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timer);
-
+  function done() {
     wrap.classList.remove('is-busy');
     wrap.classList.add('is-done');
     input.value = '';
     say('Thank you — you’re on the list.', false);
   }
 
-  frame.addEventListener('load', function () {
-    // Fires only once a submit has actually navigated the frame.
-    if (wrap.classList.contains('is-busy')) settle();
-  });
+  function failed() {
+    wrap.classList.remove('is-busy');
+    say('Sorry — that didn’t go through. Please try again.', true);
+  }
 
   form.addEventListener('submit', function (event) {
-    if (wrap.classList.contains('is-done') ||
-        wrap.classList.contains('is-busy')) {
+    if (wrap.classList.contains('is-done') || wrap.classList.contains('is-busy')) {
       event.preventDefault();
       return;
     }
@@ -83,14 +74,36 @@
       return;
     }
 
-    // Let the native submit run — it lands in the hidden iframe.
+    event.preventDefault();
     wrap.classList.add('is-busy');
     say('Signing you up…', false);
 
-    // Some browsers withhold the load event when a cross-origin response
-    // refuses to render in a frame. The request is already on its way, so
-    // confirm regardless.
-    timer = setTimeout(settle, TIMEOUT_MS);
+    // URLSearchParams carries every field, hidden ones included, and makes
+    // fetch set application/x-www-form-urlencoded — a CORS-safelisted request,
+    // so it goes straight out with no preflight.
+    var body = new URLSearchParams(new FormData(form));
+
+    var settled = false;
+    var timer = setTimeout(function () {
+      if (!settled) { settled = true; failed(); }
+    }, TIMEOUT_MS);
+
+    fetch(form.action, {
+      method: 'POST',
+      mode: 'no-cors',
+      credentials: 'omit',
+      body: body
+    }).then(function () {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      done();
+    }).catch(function () {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      failed();
+    });
   });
 
   input.addEventListener('input', function () {
