@@ -37,39 +37,38 @@ Read straight out of the Figma nodes rather than sampled from the screenshot:
 
 ## Newsletter signup
 
-Posts the same payload to the same Shopify endpoint as the footer signup on
-seekcollective.com. Verified byte-for-byte against that page's
-server-rendered HTML (from a HAR capture of the live site):
+Subscribes through **Klaviyo's client subscription endpoint**, which is
+CORS-enabled and designed for a static page on a different origin. `company_id`
+is Klaviyo's public key, so it is safe in client source.
 
 ```
-POST https://seekcollective.com/contact#footer-newsletter
-  form_type      = customer
-  utf8           = ✓
-  contact[tags]  = newsletter
-  contact[email] = <address>
+POST https://a.klaviyo.com/client/subscriptions/?company_id=Jk4WSL
+revision: 2024-10-15
+{ data: { type: "subscription",
+          attributes: { profile: { data: { type: "profile",
+            attributes: { email, subscriptions: { email: { marketing: { consent: "SUBSCRIBED" }}}}}}},
+          relationships: { list: { data: { type: "list", id: "Laz5ER" }}}}}
 ```
 
-With JavaScript disabled the form submits natively and the browser follows
-Shopify's redirect — identical to the live site.
-
-`assets/js/newsletter.js` is progressive enhancement: it sends the same body
-with `fetch` in `no-cors` mode so the visitor stays on the coming-soon page.
-An earlier version targeted a hidden iframe, which cannot work here: the
-storefront serves `X-Frame-Options: DENY` and `frame-ancestors 'none'`, so
-the response can never render in a frame and the confirmation only ever
-appeared after a timeout. `fetch` settles as soon as the response lands
-(~65ms in test, against ~6s before).
-
-`URLSearchParams` makes fetch send `application/x-www-form-urlencoded`, which
-is CORS-safelisted, so the request goes out with no preflight. The response is
-opaque, so the page can confirm the request was delivered but not what Shopify
-decided about the address; a network failure is reported and the form stays
+Klaviyo answers `202 Accepted`, so unlike an opaque cross-origin post the page
+reports real outcomes: 400 and 429 get their own messages and leave the form
 retryable.
 
-Note: the Klaviyo forms on the live site (`company_id=Jk4WSL`, lists `WMcyLw`
-and `XFCaWi`) are all "Enter to Win" giveaway forms co-branded with other
-labels — they are not the newsletter, so this form deliberately does not use
-the Klaviyo API.
+### Why not Shopify's `/contact`
+
+The live seekcollective.com footer posts to Shopify, and this page did too at
+first. A HAR of a real signup there shows the submission also carries an
+`h-captcha-response` token and a session-bound `form_key` alongside the store's
+cookies — Shopify's spam protection mints that token on the storefront itself,
+so it cannot be produced from this origin, and Shopify varies its response on
+`Sec-Fetch-Site`. A cross-origin post from here would be dropped silently with
+no way for the page to tell.
+
+The `<form>` still carries Shopify's action and hidden fields, so with
+JavaScript off it submits natively and the visitor lands on the real store —
+the best available no-JS outcome.
+
+To change the list, edit `LIST_ID` at the top of `assets/js/newsletter.js`.
 
 ## Deployment
 

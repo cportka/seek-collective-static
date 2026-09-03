@@ -1,28 +1,30 @@
 /*
  * Newsletter signup.
  *
- * The form posts the exact payload the live seekcollective.com footer signup
- * posts, verified against that page's server-rendered HTML:
+ * Posts to Klaviyo's client subscription endpoint, which is CORS-enabled and
+ * built for exactly this: a static page on a different origin subscribing an
+ * address without a server or a secret. `company_id` is Klaviyo's public key,
+ * so it is safe in client source.
  *
- *   POST /contact#footer-newsletter
- *     form_type      = customer
- *     utf8           = ✓
- *     contact[tags]  = newsletter
- *     contact[email] = <address>
+ * Why not Shopify's /contact, which is what the live seekcollective.com
+ * footer uses: a HAR of a real signup there shows the submission also carries
+ * an `h-captcha-response` token and a session-bound `form_key`, alongside the
+ * store's cookies. Shopify's spam protection mints that token on the
+ * storefront itself, so it cannot be produced from this origin — and Shopify
+ * varies its response on Sec-Fetch-Site. A cross-origin post from here would
+ * be dropped, silently, with no way for this page to tell.
  *
- * With JavaScript off the form submits natively and the browser follows
- * Shopify's redirect, exactly as the live site does.
- *
- * This file is progressive enhancement: it sends the same body with fetch so
- * the visitor stays on the coming-soon page. The storefront serves
- * `X-Frame-Options: DENY` and `frame-ancestors 'none'`, so a hidden-iframe
- * target can never render the response — fetch in no-cors mode is the honest
- * equivalent and settles as soon as the response lands instead of waiting out
- * a timeout. The response is opaque, so we can confirm that the request was
- * delivered but not what Shopify decided about the address.
+ * The <form> still carries Shopify's action and hidden fields so that with
+ * JavaScript off it submits natively and the visitor lands on the real store,
+ * which is the best available no-JS outcome.
  */
 (function () {
   'use strict';
+
+  var COMPANY_ID = 'Jk4WSL';   // Klaviyo public key
+  var LIST_ID    = 'Laz5ER';   // newsletter list
+  var REVISION   = '2024-10-15';
+  var ENDPOINT   = 'https://a.klaviyo.com/client/subscriptions/?company_id=' + COMPANY_ID;
 
   var form = document.getElementById('footer-newsletter');
   if (!form || typeof window.fetch !== 'function') return;
@@ -32,9 +34,6 @@
   var status = form.querySelector('.signup__status');
   if (!wrap || !input || !status) return;
 
-  var TIMEOUT_MS = 8000;
-
-  // Take over validation messaging now that we can render it ourselves.
   form.noValidate = true;
 
   function say(message, isError) {
@@ -42,66 +41,69 @@
     status.classList.toggle('signup__status--error', Boolean(isError));
   }
 
-  function done() {
+  function succeeded() {
     wrap.classList.remove('is-busy');
     wrap.classList.add('is-done');
     input.value = '';
     say('Thank you — you’re on the list.', false);
   }
 
-  function failed() {
+  function failed(message) {
     wrap.classList.remove('is-busy');
-    say('Sorry — that didn’t go through. Please try again.', true);
+    say(message || 'Sorry — that didn’t go through. Please try again.', true);
+  }
+
+  function payload(email) {
+    return {
+      data: {
+        type: 'subscription',
+        attributes: {
+          profile: {
+            data: {
+              type: 'profile',
+              attributes: {
+                email: email,
+                subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } }
+              }
+            }
+          }
+        },
+        relationships: { list: { data: { type: 'list', id: LIST_ID } } }
+      }
+    };
   }
 
   form.addEventListener('submit', function (event) {
-    if (wrap.classList.contains('is-done') || wrap.classList.contains('is-busy')) {
-      event.preventDefault();
-      return;
-    }
+    event.preventDefault();
 
-    if (!input.value.trim()) {
-      event.preventDefault();
+    if (wrap.classList.contains('is-done') || wrap.classList.contains('is-busy')) return;
+
+    var email = input.value.trim();
+    if (!email) {
       say('Please enter your email address.', true);
       input.focus();
       return;
     }
-
     if (!input.checkValidity()) {
-      event.preventDefault();
       say('Please enter a valid email address.', true);
       input.focus();
       return;
     }
 
-    event.preventDefault();
     wrap.classList.add('is-busy');
     say('Signing you up…', false);
 
-    // URLSearchParams carries every field, hidden ones included, and makes
-    // fetch set application/x-www-form-urlencoded — a CORS-safelisted request,
-    // so it goes straight out with no preflight.
-    var body = new URLSearchParams(new FormData(form));
-
-    var settled = false;
-    var timer = setTimeout(function () {
-      if (!settled) { settled = true; failed(); }
-    }, TIMEOUT_MS);
-
-    fetch(form.action, {
+    fetch(ENDPOINT, {
       method: 'POST',
-      mode: 'no-cors',
-      credentials: 'omit',
-      body: body
-    }).then(function () {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      done();
+      headers: { 'Content-Type': 'application/json', revision: REVISION },
+      body: JSON.stringify(payload(email))
+    }).then(function (res) {
+      // Klaviyo answers 202 Accepted; anything else is a real failure we can report.
+      if (res.status === 202 || res.ok) { succeeded(); return; }
+      if (res.status === 429) { failed('Too many attempts just now — please try again shortly.'); return; }
+      if (res.status === 400) { failed('That email address was not accepted. Please check it and try again.'); return; }
+      failed();
     }).catch(function () {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
       failed();
     });
   });
