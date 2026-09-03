@@ -37,8 +37,9 @@ Read straight out of the Figma nodes rather than sampled from the screenshot:
 
 ## Newsletter signup
 
-The form posts the same payload to the same Shopify endpoint as the footer
-signup on seekcollective.com:
+Posts the same payload to the same Shopify endpoint as the footer signup on
+seekcollective.com. Verified byte-for-byte against that page's
+server-rendered HTML (from a HAR capture of the live site):
 
 ```
 POST https://seekcollective.com/contact#footer-newsletter
@@ -48,13 +49,27 @@ POST https://seekcollective.com/contact#footer-newsletter
   contact[email] = <address>
 ```
 
-With JavaScript disabled the form submits normally and the browser follows
-Shopify's redirect — identical to the live site. `assets/js/newsletter.js`
-retargets that same submit at a hidden iframe so a visitor stays on the
-coming-soon page and gets an inline confirmation instead. The response is
-cross-origin, so the page cannot read whether Shopify accepted the address; it
-confirms once the request has been dispatched, as any cross-origin form post
-would.
+With JavaScript disabled the form submits natively and the browser follows
+Shopify's redirect — identical to the live site.
+
+`assets/js/newsletter.js` is progressive enhancement: it sends the same body
+with `fetch` in `no-cors` mode so the visitor stays on the coming-soon page.
+An earlier version targeted a hidden iframe, which cannot work here: the
+storefront serves `X-Frame-Options: DENY` and `frame-ancestors 'none'`, so
+the response can never render in a frame and the confirmation only ever
+appeared after a timeout. `fetch` settles as soon as the response lands
+(~65ms in test, against ~6s before).
+
+`URLSearchParams` makes fetch send `application/x-www-form-urlencoded`, which
+is CORS-safelisted, so the request goes out with no preflight. The response is
+opaque, so the page can confirm the request was delivered but not what Shopify
+decided about the address; a network failure is reported and the form stays
+retryable.
+
+Note: the Klaviyo forms on the live site (`company_id=Jk4WSL`, lists `WMcyLw`
+and `XFCaWi`) are all "Enter to Win" giveaway forms co-branded with other
+labels — they are not the newsletter, so this form deliberately does not use
+the Klaviyo API.
 
 ## Deployment
 
