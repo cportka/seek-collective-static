@@ -62,10 +62,11 @@
       </h1>
 
       <!--
-        Newsletter — mirrors the live seekcollective.com footer signup:
-        same Shopify customer endpoint, same hidden fields, same tags.
-        Without JS this posts straight to Shopify exactly like the live
-        site; assets/js/newsletter.js keeps the visitor on this page.
+        Newsletter. assets/js/newsletter.js subscribes via Klaviyo's
+        CORS-enabled client endpoint, because Shopify's /contact form is
+        protected by spam protection whose token cannot be minted from this
+        origin. The Shopify action and hidden fields below are the no-JS
+        fallback, and match the live seekcollective.com footer signup.
       -->
       <div class="signup">
         <div class="signup__label">
