@@ -7,7 +7,6 @@ deployed to GitHub Pages by GitHub Actions.
 ```
 index.html                     markup for the whole page
 assets/css/styles.css          all styling; mobile-first, desktop at >= 900px
-assets/js/newsletter.js        progressive enhancement for the signup form
 assets/img/hero.jpg            the hero photograph
 assets/img/favicon-*.png       favicons (32 / 180 / 512), SEEK mark only
 .github/workflows/deploy.yml   build + deploy to GitHub Pages
@@ -37,38 +36,32 @@ Read straight out of the Figma nodes rather than sampled from the screenshot:
 
 ## Newsletter signup
 
-Subscribes through **Klaviyo's client subscription endpoint**, which is
-CORS-enabled and designed for a static page on a different origin. `company_id`
-is Klaviyo's public key, so it is safe in client source.
+"Find out first by signing up here" links to Klaviyo's hosted subscribe page
+for list `Laz5ER` on company `Jk4WSL`:
 
 ```
-POST https://a.klaviyo.com/client/subscriptions/?company_id=Jk4WSL
-revision: 2024-10-15
-{ data: { type: "subscription",
-          attributes: { profile: { data: { type: "profile",
-            attributes: { email, subscriptions: { email: { marketing: { consent: "SUBSCRIBED" }}}}}}},
-          relationships: { list: { data: { type: "list", id: "Laz5ER" }}}}}
+https://manage.kmail-lists.com/subscriptions/subscribe?a=Jk4WSL&g=Laz5ER
 ```
 
-Klaviyo answers `202 Accepted`, so unlike an opaque cross-origin post the page
-reports real outcomes: 400 and 429 get their own messages and leave the form
-retryable.
+There is no form and no JavaScript on this page. Klaviyo owns the form, the
+validation and the confirmation, so there is nothing here to break.
 
-### Why not Shopify's `/contact`
+### Why not post from this page
 
-The live seekcollective.com footer posts to Shopify, and this page did too at
-first. A HAR of a real signup there shows the submission also carries an
-`h-captcha-response` token and a session-bound `form_key` alongside the store's
-cookies — Shopify's spam protection mints that token on the storefront itself,
-so it cannot be produced from this origin, and Shopify varies its response on
-`Sec-Fetch-Site`. A cross-origin post from here would be dropped silently with
-no way for the page to tell.
+Two earlier attempts are worth recording so they are not retried:
 
-The `<form>` still carries Shopify's action and hidden fields, so with
-JavaScript off it submits natively and the visitor lands on the real store —
-the best available no-JS outcome.
+- **Shopify `/contact`**, which is what the live seekcollective.com footer
+  uses. A HAR of a real signup there shows the submission also carries an
+  `h-captcha-response` token from Shopify's spam protection and a
+  session-bound `form_key`, alongside the store's cookies; the response
+  varies on `Sec-Fetch-Site`. That token is minted on the storefront, so a
+  cross-origin post from here is dropped — silently, since the response is
+  opaque.
+- **Klaviyo's client subscription API.** CORS-enabled and it does return real
+  status codes, but every submission came back `400`.
 
-To change the list, edit `LIST_ID` at the top of `assets/js/newsletter.js`.
+Both were replaced by the hosted page, which sidesteps CORS, captcha and
+opaque responses entirely.
 
 ## Deployment
 

@@ -62,47 +62,18 @@
       </h1>
 
       <!--
-        Newsletter. assets/js/newsletter.js subscribes via Klaviyo's
-        CORS-enabled client endpoint, because Shopify's /contact form is
-        protected by spam protection whose token cannot be minted from this
-        origin. The Shopify action and hidden fields below are the no-JS
-        fallback, and match the live seekcollective.com footer signup.
+        Signup is a link to Klaviyo's hosted subscribe page for list Laz5ER.
+        Nothing is posted from this origin, so there is no CORS, no captcha
+        and no opaque response to guess at: Klaviyo owns the form and the
+        confirmation.
       -->
       <div class="signup">
-        <div class="signup__label">
-          <p>Coming soon</p>
-          <p><label for="newsletter-email">Find out first by signing up here</label></p>
-        </div>
-
-        <form class="signup__form"
-              id="footer-newsletter"
-              method="post"
-              action="https://seekcollective.com/contact#footer-newsletter"
-              accept-charset="UTF-8">
-          <input type="hidden" name="form_type" value="customer">
-          <input type="hidden" name="utf8" value="&#10003;">
-          <input type="hidden" name="contact[tags]" value="newsletter">
-
-          <div class="field">
-            <input class="field__input"
-                   id="newsletter-email"
-                   type="email"
-                   name="contact[email]"
-                   autocomplete="email"
-                   spellcheck="false"
-                   placeholder="Email address"
-                   aria-label="Enter your email address"
-                   required>
-            <button class="field__submit" type="submit" aria-label="Subscribe">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor"
-                      stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-
-          <p class="signup__status" role="status" aria-live="polite"></p>
-        </form>
+        <p>Coming soon</p>
+        <p>
+          <a class="signup__link"
+             href="https://manage.kmail-lists.com/subscriptions/subscribe?a=Jk4WSL&amp;g=Laz5ER"
+             target="_blank" rel="noopener noreferrer">Find out first by signing up here</a>
+        </p>
       </div>
     </main>
 
@@ -158,6 +129,5 @@
   </div>
 </div>
 
-<script src="assets/js/newsletter.js" defer></script>
 </body>
 </html>
