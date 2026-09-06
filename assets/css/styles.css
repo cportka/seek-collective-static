@@ -165,89 +165,17 @@ img {
 }
 
 .signup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7em;
-}
-
-.signup__label {
-  flex: 0 0 auto;
-  white-space: nowrap;
+  line-height: 1.32;
   text-align: center;
-  line-height: 1.32;
 }
 
-.signup__form {
-  position: relative;
-  width: min(100%, 15em);
+.signup__link {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.06em;
 }
 
-.field {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--rule);
-  background: var(--bg);
-}
-
-.field__input {
-  flex: 1 1 0;
-  min-width: 0;
-  width: 100%;
-  padding: 0.36em 0.6em;
-  border: 0;
-  background: none;
-  color: var(--ink);
-  font: inherit;
-  line-height: 1.5;
-}
-
-.field__input::placeholder {
-  color: var(--ink);
-  opacity: 0.42;
-}
-
-.field__input:focus { outline: none; }
-.field:focus-within  { outline: 1.5px solid var(--navy); outline-offset: 2px; }
-
-.field__submit {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 2.1em;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ink);
-  cursor: pointer;
-  opacity: 0.55;
-  transition: opacity 0.18s ease;
-}
-
-.field__submit:hover,
-.field__submit:focus-visible,
-.field:focus-within .field__submit { opacity: 1; }
-
-.field__submit svg { width: 1.05em; height: 1.05em; }
-
-.signup__status {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 0.4em;
-  font-size: 0.86em;
-  line-height: 1.32;
-}
-
-.signup__status--error { color: #8c2f2f; }
-
-/* form is in flight / done */
-.signup.is-busy  .field__submit { opacity: 0.3; pointer-events: none; }
-.signup.is-done  .field         { opacity: 0.45; }
-.signup.is-done  .field__input,
-.signup.is-done  .field__submit { pointer-events: none; }
+.signup__link:hover,
+.signup__link:focus-visible { opacity: 0.68; }
 
 /* ── Footer ──────────────────────────────────────────────────────────── */
 
@@ -370,8 +298,7 @@ img {
     text-align: left;
   }
 
-  .signup { justify-content: flex-start; }
-  .signup__label { text-align: left; }
+  .signup { text-align: left; }
 
   .content__head {
     justify-content: center;
@@ -383,19 +310,6 @@ img {
   .content__main {
     margin-block: auto;
     gap: clamp(18px, 2vw, 26px);
-  }
-
-  .signup {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: flex-end;
-    gap: 0.75em;
-  }
-
-  .signup__form {
-    flex: 1 1 auto;
-    width: auto;
-    max-width: none;
   }
 
   .content__foot {
